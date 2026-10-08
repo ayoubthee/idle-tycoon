@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Losstaand project met eigen tooling
+    "mediakoning-redesign/**",
   ]),
 ]);
 

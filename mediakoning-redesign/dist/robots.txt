@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /winkelwagen.html
+Disallow: /afrekenen.html
+Sitemap: https://mediakoning.nl/sitemap.xml

@@ -1,0 +1,12 @@
+{
+  "name": "mediakoning-redesign",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Nieuwe, snelle statische webshop-frontend voor Mediakoning",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node build.mjs && npx --yes serve dist -l 4173",
+    "check": "node scripts/check.mjs"
+  }
+}
