@@ -37,7 +37,7 @@ export function home() {
           <a class="btn btn-ghost btn-lg" href="${url('keuzehulp.html')}">${icon('sparkle')} Welke past bij mij?</a>
         </div>
         <div class="hero-trust reveal">
-          <div><strong>${String(site.rating.score).replace('.', ',')}<small class="muted">/10</small></strong><span>${site.rating.count.toLocaleString('nl-NL')} reviews</span></div>
+          ${site.rating ? `<div><strong>${String(site.rating.score).replace('.', ',')}<small class="muted">/10</small></strong><span>${site.rating.count.toLocaleString('nl-NL')} reviews</span></div>` : `<div><strong>${site.shipping.warrantyMonths} mnd</strong><span>garantie</span></div>`}
           <div><strong>100+</strong><span>ontvangers & spelers</span></div>
           <div><strong>3</strong><span>afhaalpunten</span></div>
         </div>
@@ -123,7 +123,7 @@ export function home() {
     </div>
   </section>
 
-  <section class="section" style="padding-top:0">
+${site.rating ? `  <section class="section" style="padding-top:0">
     <div class="container">
       <div class="rating-card reveal">
         <div class="rating-score">${String(site.rating.score).replace('.', ',')}<small>/10</small></div>
@@ -135,7 +135,7 @@ export function home() {
         <a class="btn btn-dark" href="${site.rating.url}" target="_blank" rel="noopener">Lees alle reviews ${icon('arrow')}</a>
       </div>
     </div>
-  </section>
+  </section>` : ''}
 
   <section class="section" style="padding-top:0">
     <div class="container">
@@ -553,8 +553,9 @@ export function aboutPage() {
   <section class="section-sm"><div class="container">
     <div class="stats">
       <div class="stat reveal"><strong>100+</strong><span>ontvangers & mediaspelers</span></div>
-      <div class="stat reveal"><strong>${String(site.rating.score).replace('.', ',')}</strong><span>gemiddelde beoordeling</span></div>
-      <div class="stat reveal"><strong>${site.rating.count.toLocaleString('nl-NL')}+</strong><span>klantreviews</span></div>
+      ${site.rating ? `<div class="stat reveal"><strong>${String(site.rating.score).replace('.', ',')}</strong><span>gemiddelde beoordeling</span></div>
+      <div class="stat reveal"><strong>${site.rating.count.toLocaleString('nl-NL')}+</strong><span>klantreviews</span></div>` : `<div class="stat reveal"><strong>${site.shipping.warrantyMonths}</strong><span>maanden garantie</span></div>
+      <div class="stat reveal"><strong>${site.shipping.returnDays}</strong><span>dagen bedenktijd</span></div>`}
       <div class="stat reveal"><strong>3</strong><span>afhaalpunten</span></div>
     </div>
   </div></section>

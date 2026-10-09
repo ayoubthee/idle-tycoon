@@ -16,6 +16,12 @@ npm run serve        # bouwt en start een lokale server op http://localhost:4173
 npm run check        # opent elke pagina in Chromium: JS-fouten + kapotte links
 ```
 
+Neutrale demoversie (fictieve naam "Voorbeeldshop", fictieve contactgegevens, conceptbalk bovenaan):
+
+```bash
+DEMO=1 node build.mjs   # bouwt naar ./dist-demo
+```
+
 Je kunt `dist/index.html` ook direct openen, of de map `dist/` uploaden naar elke host
 (Netlify, Vercel, Cloudflare Pages, een gewone webserver).
 

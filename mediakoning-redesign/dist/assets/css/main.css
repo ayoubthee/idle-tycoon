@@ -3598,3 +3598,12 @@ body.has-sticky .wa-float {
     font-size: 0.85rem;
   }
 }
+
+.demo-banner {
+  background: var(--gold);
+  color: #2a1d00;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+}

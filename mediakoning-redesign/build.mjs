@@ -1,6 +1,6 @@
 // Bouwt de volledige statische site naar ./dist
 // Gebruik: node build.mjs
-import { mkdir, writeFile, copyFile, rm, readdir } from 'node:fs/promises';
+import { mkdir, writeFile, copyFile, rm, readdir, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,13 +13,52 @@ import { withBrand, specTags, catOf } from './src/lib/components.mjs';
 import * as P from './src/pages.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const out = join(root, 'dist');
+// DEMO=1 bouwt een neutrale versie (fictieve naam en gegevens) naar ./dist-demo
+const DEMO = process.env.DEMO === '1';
+const out = join(root, DEMO ? 'dist-demo' : 'dist');
 const pages = [];
+
+if (DEMO) {
+  Object.assign(site, {
+    demo: true,
+    name: 'Voorbeeldshop',
+    domain: 'https://example.com',
+    description:
+      'Voorbeeldshop is een conceptontwerp voor een webshop in IPTV-ontvangers, Android TV-boxen en mediaspelers: eerlijk advies, snelle levering en afhaalpunten.',
+    email: 'info@example.com',
+    supportEmail: 'support@example.com',
+    phone: '+31 20 000 0000',
+    phoneDisplay: '020 000 0000',
+    whatsapp: '',
+    rating: null,
+    socials: [],
+  });
+  site.locations = site.locations.map((l, i) => ({ ...l, street: `Voorbeeldstraat ${i + 1}`, zip: `${1000 + i * 2000} AB` }));
+}
+const brandSwap = (html) =>
+  !DEMO
+    ? html
+    : html
+        .replaceAll('Media<b>koning</b>', 'Voorbeeld<b>shop</b>')
+        .replaceAll('Mediakoning', 'Voorbeeldshop')
+        .replaceAll('mediakoning', 'voorbeeldshop')
+        .replaceAll(' in Beverwijk', '')
+        .replace(/\sreveal(?=[\s"])/g, '');
 
 async function emit(path, render) {
   const depth = path.split('/').length - 1;
   setBase('../'.repeat(depth));
-  const html = render();
+  let html = brandSwap(render());
+  if (DEMO) {
+    html = html.replace('<meta name="robots" content="noindex">', '').replace('<head>', '<head>\n<meta name="robots" content="noindex">');
+    // De artifact-viewer levert zelf het documentskelet voor de startpagina.
+    if (path === 'index.html')
+      html = html
+        .replace(/<!doctype html>\s*<html[^>]*>\s*<head>/i, '')
+        .replace(/<\/head>\s*<body[^>]*>/i, '')
+        .replace(/<\/body>\s*<\/html>\s*$/i, '')
+        .replace(/<title>[^<]*<\/title>/, '<title>Voorbeeldshop IPTV-webshop</title>');
+  }
   const file = join(out, path);
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, html);
@@ -146,10 +185,13 @@ const catalog = {
   ],
 };
 await mkdir(join(out, 'assets/js'), { recursive: true });
-await writeFile(join(out, 'assets/js/catalog.js'), `window.MK=${JSON.stringify(catalog)};`);
+await writeFile(join(out, 'assets/js/catalog.js'), brandSwap(`window.MK=${JSON.stringify(catalog)};`));
 
 // ── Statische assets ──
 await copyDir(join(root, 'src/assets'), join(out, 'assets'));
+if (DEMO)
+  for (const f of ['assets/css/main.css', 'assets/js/app.js'])
+    await writeFile(join(out, f), brandSwap(await readFile(join(out, f), 'utf8')));
 
 await writeFile(
   join(out, 'favicon.svg'),
@@ -167,7 +209,7 @@ await writeFile(
     .map((p) => `  <url><loc>${site.domain}/${p === 'index.html' ? '' : p}</loc></url>`)
     .join('\n')}\n</urlset>\n`,
 );
-await writeFile(join(out, 'robots.txt'), `User-agent: *\nDisallow: /winkelwagen.html\nDisallow: /afrekenen.html\nSitemap: ${site.domain}/sitemap.xml\n`);
+await writeFile(join(out, 'robots.txt'), DEMO ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nDisallow: /winkelwagen.html\nDisallow: /afrekenen.html\nSitemap: ${site.domain}/sitemap.xml\n`);
 
-console.log(`✓ ${pages.length} pagina's gebouwd in dist/`);
+console.log(`✓ ${pages.length} pagina's gebouwd in ${DEMO ? 'dist-demo' : 'dist'}/`);
 void url;

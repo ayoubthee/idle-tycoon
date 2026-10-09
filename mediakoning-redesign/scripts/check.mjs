@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require('playwright')); } catch { ({ chromium } = await import('/opt/node22/lib/node_modules/playwright/index.js').catch(() => import('playwright'))); }
 
-const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../dist');
+const dist = resolve(dirname(fileURLToPath(import.meta.url)), '..', process.env.DIST || 'dist');
 const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.json': 'application/json', '.xml': 'application/xml', '.txt': 'text/plain', '.webmanifest': 'application/manifest+json' };
 const server = http.createServer(async (req, res) => {
   const p = join(dist, decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\/$/, '/index.html'));

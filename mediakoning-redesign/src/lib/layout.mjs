@@ -18,9 +18,9 @@ function topbar() {
         <li>${icon('bolt')} Op werkdagen voor ${site.shipping.cutoff} besteld, vandaag verzonden</li>
         <li>${icon('store')} Afhalen in Amsterdam, Rotterdam & Amersfoort</li>
       </ul>
-      <a class="rating" href="${site.rating.url}" target="_blank" rel="noopener">
+      ${site.rating ? `<a class="rating" href="${site.rating.url}" target="_blank" rel="noopener">
         <span class="stars">★★★★★</span> ${String(site.rating.score).replace('.', ',')} / 10 · ${site.rating.source}
-      </a>
+      </a>` : ''}
     </div>
   </div>`;
 }
@@ -153,7 +153,7 @@ function footer() {
         <div>
           ${logo()}
           <p>${esc(site.description)}</p>
-          <p><span class="stars">★★★★★</span> <strong style="color:#fff">${String(site.rating.score).replace('.', ',')}</strong> uit ${site.rating.count.toLocaleString('nl-NL')} beoordelingen</p>
+          ${site.rating ? `<p><span class="stars">★★★★★</span> <strong style="color:#fff">${String(site.rating.score).replace('.', ',')}</strong> uit ${site.rating.count.toLocaleString('nl-NL')} beoordelingen</p>` : ''}
         </div>
         <div>
           <h4>Shop</h4>
@@ -225,7 +225,7 @@ export function layout({ title, description = site.description, path, active, bo
         addressLocality: site.locations[0].city,
         addressCountry: 'NL',
       },
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: site.rating.score, bestRating: 10, ratingCount: site.rating.count },
+      ...(site.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: site.rating.score, bestRating: 10, ratingCount: site.rating.count } } : {}),
     },
     ...jsonLd,
   ];
@@ -258,6 +258,7 @@ ${noindex ? '<meta name="robots" content="noindex">' : ''}
 </head>
 <body class="${bodyClass}">
 <a class="skip-link" href="#main">Naar de inhoud</a>
+${site.demo ? `<div class="demo-banner" role="note"><strong>Conceptontwerp</strong> — demo-webshop met fictieve bedrijfsgegevens. Bestellingen en formulieren worden niet verwerkt.</div>` : ''}
 ${topbar()}
 ${header(active)}
 <main id="main">

@@ -267,7 +267,20 @@
   });
 
   /* ───────── Vergelijken ───────── */
-  const params = new URLSearchParams(location.search);
+  // Querystrings kunnen in sommige omgevingen wegvallen; bewaar ze daarom ook kort in sessionStorage.
+  const pageKey = (path) => 'mk-qs:' + path.split('/').pop();
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href*="?"]');
+    if (!a || a.target === '_blank' || a.origin !== location.origin) return;
+    try { sessionStorage.setItem(pageKey(a.pathname), a.search); } catch { /* */ }
+  }, true);
+  let qs = location.search;
+  try {
+    const k = pageKey(location.pathname);
+    if (!qs) qs = sessionStorage.getItem(k) || '';
+    sessionStorage.removeItem(k);
+  } catch { /* */ }
+  const params = new URLSearchParams(qs);
   let cmp = store.get('mk-compare', []).filter((s) => bySlug[s]);
   const compareRoot = $('[data-compare-root]');
   if (compareRoot && params.get('ids')) {
@@ -502,7 +515,7 @@
       if (state.sale) sp.set('sale', '1');
       if (state.q) sp.set('q', state.q);
       if (state.sort !== 'pop') sp.set('sort', state.sort);
-      history.replaceState(null, '', `${location.pathname}${sp.toString() ? '?' + sp : ''}`);
+      try { history.replaceState(null, '', `${location.pathname}${sp.toString() ? '?' + sp : ''}`); } catch { /* sandbox */ }
     }
     forms.forEach((f) => {
       on(f, 'change', () => { readForm(f); writeForms(); apply(); });
